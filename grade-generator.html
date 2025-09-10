@@ -4,11 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grade generator</title>
-
-
     
 </head>
-<body>
-    
+<body> 
+  <h2>Student Grade Generator</h2>
+
+  <!-- Input field for the user to enter marks -->
+  <label>Enter Marks (0 - 100):</label><br>
+  <input type="number" id="marksInput" /><br>
+
+  <!-- Button to trigger grade calculation -->
+  <button onclick="generateGrade()">Get Grade</button>
+
+  <!-- This is where the result will be displayed -->
+  <p id="result"></p>
+
+   <script>
+    function generateGrade() {
+      // Gets the value from input and convert it to a number
+      const marks = Number(document.getElementById("marksInput").value);
+      let grade = "";
+
+      // Checks if the input is valid
+      if (isNaN(marks) || marks < 0 || marks > 100) {
+        grade = "Please enter a valid number between 0 and 100.";
+      } else if (marks > 79) {
+        grade = "Grade: A";
+      } else if (marks >= 60) {
+        grade = "Grade: B";
+      } else if (marks >= 49) {
+        grade = "Grade: C";
+      } else if (marks >= 40) {
+        grade = "Grade: D";
+      } else {
+        grade = "Grade: E";
+      }
+
+      // Shows the grade on the page
+      document.getElementById("result").innerText = grade;
+    }
+  </script>
 </body>
 </html>
