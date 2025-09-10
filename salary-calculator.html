@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=, initial-scale=1.0">
+    <title>Salary Calculator</title>
+</head>
+<style>
+    body {
+      font-family: sans-serif;
+      margin: 40px;
+      text-align: center;
+      background-color: #f5f7fa;
+    }
+    h2 {
+      color: #2c3e50;
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px auto;
+      display: block;
+      width: 250px;
+      font-size: 16px;
+    }
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    #result {
+      margin-top: 20px;
+      padding: 20px;
+      background: #ecf0f1;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
+    }
+    h3 {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Net Salary Calculator</h2>
+
+  <label for="basic">Basic Salary:</label>
+  <input type="number" id="basic" placeholder="Enter basic salary">
+
+  <label for="benefits">Benefits:</label>
+  <input type="number" id="benefits" placeholder="Enter benefits">
+
+  <button onclick="calculateNetSalary()">Calculate Net Salary</button>
+
+  <div id="result"></div>
+
+  <script>
+    // Calculate PAYE based on KRA tax bands
+    function calculatePAYE(taxable) {
+      if (taxable <= 24000) return taxable * 0.10;
+      if (taxable <= 32333) return (24000 * 0.10) + ((taxable - 24000) * 0.25);
+      if (taxable <= 500000) return (24000 * 0.10) + (8333 * 0.25) + ((taxable - 32333) * 0.30);
+      if (taxable <= 800000) return (24000 * 0.10) + (8333 * 0.25) + (467667 * 0.30) + ((taxable - 500000) * 0.325);
+      return (24000 * 0.10) + (8333 * 0.25) + (467667 * 0.30) + (300000 * 0.325) + ((taxable - 800000) * 0.35);
+    }
+
+    // Calculate NSSF Tier 1 and 2
+    function calculateNSSF(gross) {
+      const tier1 = Math.min(gross, 6000) * 0.06;
+      const tier2 = gross > 6000 ? Math.min(gross - 6000, 12000) * 0.06 : 0;
+      return tier1 + tier2;
+    }
+
+    // Calculate Net Salary
+    function calculateNetSalary() {
+      const basic = Number(document.getElementById("basic").value);
+      const benefits = Number(document.getElementById("benefits").value);
+      const gross = basic + benefits;
+
+      if (isNaN(basic) || isNaN(benefits)) {
+        document.getElementById("result").innerText = "Please enter valid numbers.";
+        return;
+      }
+
+      const nssf = calculateNSSF(gross);
+      const nhif = gross * 0.0275; // NHIF assumed at 2.75%
+      const housingLevy = gross * 0.015; // 1.5% of gross
+      const taxableIncome = gross - nssf - nhif - housingLevy;
+
+      // Calculate PAYE and apply personal relief
+      let paye = calculatePAYE(taxableIncome);
+      const personalRelief = 2400;
+      paye = Math.max(paye - personalRelief, 0);
+
+      const totalDeductions = nssf + nhif + housingLevy + paye;
+      const net = gross - totalDeductions;
+
+      // Display results
+      document.getElementById("result").innerHTML = `
+        <h3>Results</h3>
+        <p><strong>Gross Salary:</strong> KES ${gross.toFixed(2)}</p>
+        <p><strong>NSSF:</strong> KES ${nssf.toFixed(2)}</p>
+        <p><strong>NHIF (2.75%):</strong> KES ${nhif.toFixed(2)}</p>
+        <p><strong>Housing Levy (1.5%):</strong> KES ${housingLevy.toFixed(2)}</p>
+        <p><strong>PAYE (after Relief):</strong> KES ${paye.toFixed(2)}</p>
+        <hr>
+        <p><strong style="color:green">Net Salary:</strong>  KES ${net.toFixed(2)}</p>
+      `;
+    }
+  </script>
+
+</body>
+</html>
